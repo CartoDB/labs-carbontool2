@@ -1,7 +1,17 @@
-var mapping = (function () {
+var mapping = (function () {  
+  var editableLayers;
 
-  var map,mapLayers;
-  mapLayers = {};
+  var callbacks = {
+    'current-view' : function(bounds){
+      console.log(bounds);
+    },
+    'circle' : function(circle){
+      console.log(circle);
+    },
+    'polygon': function(polygon){
+      console.log(polygon);
+    }
+  };
 
   var config = {
     MAX_POLYGON_AREA: 8000000*1000*1000,// #8.000.000km^2
@@ -48,12 +58,27 @@ var mapping = (function () {
     ]
   };
 
+  var removeLayerFeatures = function(){
+    editableLayers.getLayers().forEach(function(l){
+      editableLayers.removeLayer(l)
+    });
+  }
+
+
+  var validateLayer = function(layer){
+    var max_area = config.MAX_POLYGON_AREA;
+    debugger;
+  }
+
   var setupMap = function(){
     // initiate leaflet map
     var map = new L.Map(config.div || 'map', {
       center: [0,0],
       zoom: 2
     })
+
+    var mapLayers;
+    mapLayers = {};
 
     // Base layer switcher
     var basemap = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
@@ -108,14 +133,92 @@ var mapping = (function () {
         $('.legends input[id=' + i + ']').click();
       }
     };
-  }
+
+    // set up the drawing plugin
+
+    // Initialise the FeatureGroup to store editable layers
+    editableLayers = new L.FeatureGroup();
+    map.addLayer(editableLayers);
+
+    // Initialise the draw control and pass it the FeatureGroup of editable layers
+    var drawControl = new L.Control.Draw({
+      draw: {
+        polyline : false,
+        rectangle: false,
+        marker: false,
+        polygon: {
+          allowIntertsection: false,
+          drawError: {
+            color: '#e1e100', // Color the shape will turn when intersects
+            message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
+          },
+          shapeOptions: {
+            color: '#bada55'
+          }
+        },
+        circle: {
+          shapeOptions: {
+            color: '#bada55'
+          }
+        }
+      },
+      edit: {
+        featureGroup: editableLayers,
+        remove: false,
+        edit: false
+      }
+    });
+    map.addControl(drawControl);
+
+    // Events on polygon drawn
+
+    map.on('draw:created', function (e) {
+      var type = e.layerType,
+          layer = e.layer;
+
+
+      if (validateLayer(layer)){
+        // Do whatever else you need to. (save to db, add to map etc)
+        editableLayers.addLayer(layer);
+
+        if (type === 'polygon') {
+          console.log("POLY");
+          callbacks['polygon'](layer);
+        } else if (type === 'circle'){
+          console.log("CIRCLE");
+          callbacks['circle'](layer);
+        }
+      }
+
+
+    });
+
+
+    $('#draw-polygon').click(function(){
+      removeLayerFeatures();
+      new L.Draw.Polygon(map, drawControl.options.polygon).enable();
+    })
+    $('#draw-circle').click(function(){
+      removeLayerFeatures();
+      new L.Draw.Circle(map, drawControl.options.circle).enable();
+    })
+    $('#current-view').click(function(){
+      removeLayerFeatures();
+      callbacks['current-view'](map.getBounds());
+    })
+
+  } // end of setup map
 
 
   return {
+    setCallbacks: function(type, callback){
+      callbacks[type] = callback; 
+    },
+    getMap : function(){ 
+      return map 
+    },
     init : function (newConfig) {
       _.extend(config,newConfig);
-      console.log("MAP!");
-      console.log(config);
       setupMap();
     }
   };

@@ -34,8 +34,10 @@
               <div class="Grid-cell Grid-cell--col6 u-txt-right">
                 <nav class="">
                   <ul class="u-ilist">
+                    <!--
                     <li class="u-malign"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://cartodb.com" data-text="Carbon Tool Calculator from @cartoDB" data-via="CartoDB">Tweet</a>
                     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script></li>
+                    -->
                     <li class="u-malign u-lspace-xl">
                       <p class="button button--white">
                         <a href="https://github.com/CartoDB/labs-carbontool2">Fork Me on Github</a>
@@ -68,35 +70,29 @@
                   <ul>
                   </ul>
                 </div>
-                <div id="map" class="u-pa">
-                  <button type="button" class="infoArrow btn btn-primary btn-arrow-right">Use these buttons to draw your polygon </button>
-                </div>
+                <div id="map" class="u-pa"></div>
               </div>
               <div class="Grid-cell Grid-cell--col3">
                 <div id="sidebar" class="u-padding-m u-pr">
-                  <ul class="List-blocks">
-                    <li class="u-vspace-xxl">
-                      <div class="u-vspace-l">
-                        <span class="Number-circle u-txt-center fill fill-dark color-white u-iblock u-malign">1</span> <h2 class="u-iblock u-malign"><strong>Choose Area</strong></h2>
-                      </div>
+                  <div class="u-vspace-l">
+                    <span class="Number-circle u-txt-center fill fill-dark color-white u-iblock u-malign">1</span> <h2 class="u-iblock u-malign"><strong>Choose Area</strong></h2>
+                  </div>
 
-                      <ul class="ListOptions u-vspace-xxl">
-                        <li>
-                          <label>
-                            <input class="u-iblock u-malign" type="radio" for="option1" name="area" value="currentView" checked>
-                            <p class="u-iblock u-malign" id="option1"> Current Map View</p>
-                          </label>
-                        </li>
-                        <li>
-                          <label>
-                            <input class="u-iblock u-malign" type="radio" for="option3" name="area" value="polygon">
-                            <p class="u-iblock u-malign" id="option3"> Draw a polygon</p>
-                          </label>
-                        </li>
-                      </ul>
+                  <ul class="u-ilist u-vspace-m choose-area">
+                    <li>
+                      <p class="button button--small button--green">
+                        <a href="#" id="current-view" class="btn btn-sm btn-success draw">Current View</a>
+                      </p>
                     </li>
-                    <li class="u-vspace-xxl">
-
+                    <li>
+                      <p class="button button--small button--green">
+                        <a href="#" id="draw-polygon" class="btn btn-sm btn-success draw">Draw a Polygon</a>
+                      </p>
+                    </li>
+                    <li>
+                      <p class="button button--small button--green">
+                        <a href="#" id="draw-circle" class="btn btn-sm btn-success draw">Draw a Circle</a>
+                      </p>
                     </li>
                   </ul>
                   <p class="text-info js-about">2015 - <a href="#">About us</a></p>

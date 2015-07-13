@@ -46,7 +46,7 @@
 .tabs {
     position: absolute;
     top: 10px;
-    right: 0px;
+    right: 10px;
     z-index: 10;
     height: 40px;
     box-shadow: rgba(0,0,0,.2) 0 0 4px 2px;
@@ -103,7 +103,7 @@
 /* legend selector */
 .legends {
     position: absolute;
-    right: 0px;
+    right: 10px;
     bottom: 90px;
     z-index: 10;
     box-shadow: rgba(0,0,0,.2) 0 0 4px 2px;
@@ -164,4 +164,20 @@
 .legends h2 {
   margin-bottom: 12px;
   color: #333;
+}
+
+/* leaflet draw control */
+.leaflet-draw{
+  display:none;
+}
+
+.button--small{
+  font-size: 12px;
+}
+.button--small a{
+  padding:6px;
+}
+
+.choose-area li{
+  margin: 2px 0;
 }
