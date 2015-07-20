@@ -25,7 +25,7 @@
 }
 
 /* modal */
-#modal {
+.modal {
   position: fixed;
   top: 0;
   right: 0;
@@ -180,4 +180,18 @@
 
 .choose-area li{
   margin: 2px 0;
+}
+
+/* button */
+button {
+  background: none;
+  padding: 0;
+  border: none;
+}
+
+.button--gray a {
+  background: #d5d5d5;
+}
+.button--gray a:hover {
+  background: #e7e7e7;
 }

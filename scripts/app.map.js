@@ -1,18 +1,5 @@
 var mapping = (function () {  
   var editableLayers;
-
-  var callbacks = {
-    'current-view' : function(bounds){
-      console.log(bounds);
-    },
-    'circle' : function(circle){
-      console.log(circle);
-    },
-    'polygon': function(polygon){
-      console.log(polygon);
-    }
-  };
-
   var config = {
     MAX_POLYGON_AREA: 8000000*1000*1000,// #8.000.000km^2
     MAP_LAYERS: [
@@ -57,6 +44,21 @@ var mapping = (function () {
 
     ]
   };
+  
+  var callbacks = {
+    'current-view' : function(bounds){
+      console.log("Default callback");
+      console.log(bounds);
+    },
+    'circle' : function(circle){
+      console.log("Default callback");
+      console.log(circle);
+    },
+    'polygon': function(polygon){
+      console.log("Default callback");
+      console.log(polygon);
+    }
+  };
 
   var removeLayerFeatures = function(){
     editableLayers.getLayers().forEach(function(l){
@@ -64,11 +66,53 @@ var mapping = (function () {
     });
   }
 
+  var bounds2latngs = function(layer){
+    return [
+      layer.getNorthEast(),
+      layer.getSouthEast(),
+      layer.getSouthWest(),
+      layer.getNorthWest(),
+      layer.getNorthEast()
+    ];
+  };
 
   var validateLayer = function(layer){
-    var max_area = config.MAX_POLYGON_AREA;
-    debugger;
-  }
+    var area = 0.0, points = [];
+
+    if (layer.getLatLngs) {
+      // That's a polygon
+      points = layer.getLatLngs();
+    } else if (layer.getNorthEast){
+      // That's a view
+      points = bounds2latngs(layer);
+    } else if (layer.getBounds){
+      // That's a circle, we asume as OK the bounds
+      points = bounds2latngs(layer.getBounds());
+    }
+    return geodesicArea(points) < config.MAX_POLYGON_AREA;
+  };
+  
+  // Ported from the OpenLayers implementation. See https://github.com/openlayers/openlayers/blob/master/lib/OpenLayers/Geometry/LinearRing.js#L270
+  var geodesicArea = function (latLngs) {
+    var pointsCount = latLngs.length,
+      area = 0.0,
+      d2r = L.LatLng.DEG_TO_RAD,
+      p1, p2;
+
+    if (pointsCount > 2) {
+      for (var i = 0; i < pointsCount; i++) {
+        p1 = latLngs[i];
+        p2 = latLngs[(i + 1) % pointsCount];
+        area += ((p2.lng - p1.lng) * d2r) *
+            (2 + Math.sin(p1.lat * d2r) + Math.sin(p2.lat * d2r));
+      }
+      area = area * 6378137.0 * 6378137.0 / 2.0;
+    }
+
+    return Math.abs(area);
+  };
+
+  var reportAreaTooBig = function(){alert('area too big')}
 
   var setupMap = function(){
     // initiate leaflet map
@@ -188,6 +232,8 @@ var mapping = (function () {
           console.log("CIRCLE");
           callbacks['circle'](layer);
         }
+      } else {
+        reportAreaTooBig();
       }
 
 
@@ -204,15 +250,27 @@ var mapping = (function () {
     })
     $('#current-view').click(function(){
       removeLayerFeatures();
-      callbacks['current-view'](map.getBounds());
+      if (validateLayer(map.getBounds())){
+        callbacks['current-view'](map.getBounds())
+      } else {
+        reportAreaTooBig();
+      }
+
     })
 
   } // end of setup map
 
 
   return {
-    setCallbacks: function(type, callback){
-      callbacks[type] = callback; 
+    bounds2latngs: bounds2latngs,
+    setReport: function(fn){
+      report = fn;
+    },
+    setReportAreaTooBig: function(fn){
+      reportAreaTooBig = fn;
+    },
+    setCallbacks: function(fns){
+      callbacks = fns; 
     },
     getMap : function(){ 
       return map 

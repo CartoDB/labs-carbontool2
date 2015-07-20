@@ -51,7 +51,7 @@
           <!-- content -->
           <div class="Grid" id="content">
             <div class="Grid-inner">
-              <div class="Grid-cell fill-green Grid-cell--col9 u-pr">
+              <div class="Grid-cell fill-green Grid-cell--col8 u-pr">
 
                 <ul class="tabs">
                     <li>
@@ -72,7 +72,7 @@
                 </div>
                 <div id="map" class="u-pa"></div>
               </div>
-              <div class="Grid-cell Grid-cell--col3">
+              <div class="Grid-cell Grid-cell--col4">
                 <div id="sidebar" class="u-padding-m u-pr">
                   <div class="u-vspace-l">
                     <span class="Number-circle u-txt-center fill fill-dark color-white u-iblock u-malign">1</span> <h2 class="u-iblock u-malign"><strong>Choose Area</strong></h2>
@@ -95,6 +95,19 @@
                       </p>
                     </li>
                   </ul>
+                  <div class="u-vspace-l">
+                    <span class="Number-circle u-txt-center fill fill-dark color-white u-iblock u-malign">2</span> <h2 class="u-iblock u-malign"><strong>Launch report</strong> </h2>
+                  </div>
+
+                  <button id="select-area" class="button button--small button--gray">
+                    <a class="btn btn-sm btn-success draw">
+                      <span class="Tooltip Tooltip--horizontal-left Tooltip--vertical-bottom">
+                        Select an area to analyse
+                      </span>
+                      Launch 
+                    </a>
+                  </button>
+                  </ul>
                   <p class="text-info js-about">2015 - <a href="#">About us</a></p>
                 </div>
               </div>
@@ -104,7 +117,7 @@
       </div>
 
     <!-- about modal -->
-    <div id="modal" class="u-valign u-txt-center" style="display: none;">
+    <div id="modal-about" class="modal u-valign u-txt-center" style="display: none;">
         <div class="modal-inner u-iblock u-malign u-padding-xxl">
             <div class="modal-header navbar-custom u-vspace-xxl">
               <h2><strong>ABOUT</strong></h2>
@@ -115,6 +128,17 @@
       </div>
     </div>
 
+    <!-- area too big modal -->
+    <div id="modal-area-too-big" class="modal u-valign u-txt-center" style="display: none;">
+        <div class="modal-inner u-iblock u-malign u-padding-m">
+            <div class="modal-header navbar-custom u-vspace-m color-red">
+              <h2><strong>Area too big</strong></h2>
+            </div>
+            <div class="modal-body u-txt-center">
+              <p class="u-vspace-m">Please, select a smaller area to perform the analysis.</p>
+            </div>
+      </div>
+    </div>
 
 
     <script src="https://cartodb-libs.global.ssl.fastly.net/cartodb.js/v3/3.15/cartodb.js"></script>
@@ -122,14 +146,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.3/handlebars.min.js"></script>
     <script src="scripts/app.js"></script>
     <script src="scripts/app.map.js"></script>
+    <script src="scripts/app.report.js"></script>
     <script>
       $(document).ready(function(){
 
         $('.js-about').click(function() {
-          $('#modal').fadeIn();
+          $('#modal-about').fadeIn();
         });
 
-        $('#modal').click(function() {
+        $('.modal').click(function() {
           $(this).fadeOut();
         });
 
