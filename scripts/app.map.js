@@ -14,7 +14,7 @@ var mapping = (function () {
          name: 'carbon',
          opacity: 0.7,
          url: 'http://lifeweb-maps.unep-wcmc.org/ArcGIS/rest/services/lifeweb/carbon/MapServer/tile/{z}/{y}/{x}',
-         enabled: true
+         enabled: false
       }, {
         name: 'carbon sequestration',
         opacity: 0.7,
