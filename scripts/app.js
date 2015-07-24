@@ -8,7 +8,7 @@ var app = (function () {
 
 		/* Pass to the map the reporting functions*/
 		mapping.setCallbacks(reporting.getReports);
-		mapping.setReportAreaTooBig(reporting.getReportAreaTooBig)
+		mapping.setReportAreaTooBig(reporting.getReportAreaTooBig);
     }
   };
 })();

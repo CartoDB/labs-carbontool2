@@ -24,8 +24,6 @@ var reporting = (function () {
 
   var sqlClient = new cartodb.SQL({user: config.cdbUser});
 
-
-
   var QUERIES = {
     'CARBON'            : "SELECT SUM((ST_Value(rast, 1, x, y) / 100) * ((ST_Area(ST_Transform(ST_SetSRID(ST_PixelAsPolygon(rast, x, y), 4326), 954009)) / 10000) / 100)) AS total, ST_Area(<%= polygon %>::geography) as area FROM carbonsequestration CROSS JOIN generate_series(1,10) As x CROSS JOIN generate_series(1,10) As y WHERE rid in ( SELECT rid FROM carbonsequestration WHERE ST_Intersects(rast, <%= polygon %>) ) AND ST_Intersects(ST_Translate(ST_SetSRID(ST_Point(ST_UpperLeftX(rast), ST_UpperLeftY(rast)), 4326), ST_ScaleX(rast)*x, ST_ScaleY(rast)*y), <%= polygon %> );",
     'CARBON_COUNTRIES'  : "SET statement_timeout TO 100000; SELECT country, SUM((ST_Value(rast, 1, x, y) / 100) * ((ST_Area(ST_Transform(ST_SetSRID(ST_PixelAsPolygon(rast, x, y), 4326), 954009)) / 10000) / 100)) AS total, ST_Area(<%= polygon %>::geography) as area FROM carbonintersection CROSS JOIN generate_series(1,10) As x CROSS JOIN generate_series(1,10) As y CROSS JOIN countries WHERE rid IN ( SELECT rid FROM carbonintersection WHERE ST_Intersects(rast, <%= polygon %>) ) AND objectid IN ( SELECT objectid FROM countries WHERE ST_Intersects(the_geom, <%= polygon %>) ) AND ST_Intersects(ST_Translate(ST_SetSRID(ST_Point(ST_UpperLeftX(rast) + (ST_ScaleX(rast)/2), ST_UpperLeftY(rast) + (ST_ScaleY(rast)/2)), 4326), ST_ScaleX(rast)*x, ST_ScaleY(rast)*y), <%= polygon %> ) AND ST_Intersects(ST_Translate(ST_SetSRID(ST_Point(ST_UpperLeftX(rast) + (ST_ScaleX(rast)/2), ST_UpperLeftY(rast) + (ST_ScaleY(rast)/2)), 4326), ST_ScaleX(rast)*x, ST_ScaleY(rast)*y), the_geom ) GROUP BY country;",
@@ -36,6 +34,12 @@ var reporting = (function () {
   }
 
   var addReportButton = function(){
+
+    $('.draw-buttons button')
+      .removeAttr('disabled')
+      .addClass('button--green')
+      .removeClass('button--gray');
+
     $(config.selectors.launchButton)
       .removeClass('button--gray')
       .removeClass('button--red')
@@ -101,10 +105,10 @@ var reporting = (function () {
           form.getSouthWest(),
           form.getNorthWest(),
           form.getNorthEast()
-        ].map(function(p){return [p.lng,p.lat]})];
+        ].map(function(p){return [p.lat,p.lng]})];
       sql = 'ST_GeomFromText( \'' + wtk_polygon(coords)  + '\',4326)';
     } else if (geometryType == types.POLYGON){
-      var coords = [form.getLatLngs().map(function(p){return [p.lng,p.lat]})];
+      var coords = [form.getLatLngs().map(function(p){return [p.lat,p.lng]})];
       sql = 'ST_GeomFromText( \'' + wtk_polygon(coords)  + '\',4326)'
     } else if (geometryType == types.CIRCLE){
       var lat = form.getLatLng().lat;
@@ -119,6 +123,14 @@ var reporting = (function () {
 
   var launchReport = function(e){
     var geom = getSQLGeometry(geometryReport);
+
+    $('.report').hide();
+    $('.report .section').hide();
+
+    $('.draw-buttons button')
+      .attr('disabled','disabled')
+      .addClass('button--gray')
+      .removeClass('btn-success');
 
     disableReportButton(
       config.launchButtonTexts.running,
@@ -245,7 +257,6 @@ var reporting = (function () {
     $.when(d1,d2,d3,d4,d5).done(function(v1,v2,v3,v4,v5){
       console.log("Total time" + (v1 + v2 + v3 + v4 + v5))
       addReportButton();
-      debugger;
     });
   };
 

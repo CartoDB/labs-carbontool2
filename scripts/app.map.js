@@ -1,4 +1,4 @@
-var mapping = (function () {  
+var mapping = (function () {
   var editableLayers;
   var config = {
     MAX_POLYGON_AREA: 8000000*1000*1000,// #8.000.000km^2
@@ -44,7 +44,7 @@ var mapping = (function () {
 
     ]
   };
-  
+
   var callbacks = {
     'current-view' : function(bounds){
       console.log("Default callback");
@@ -91,7 +91,7 @@ var mapping = (function () {
     }
     return geodesicArea(points) < config.MAX_POLYGON_AREA;
   };
-  
+
   // Ported from the OpenLayers implementation. See https://github.com/openlayers/openlayers/blob/master/lib/OpenLayers/Geometry/LinearRing.js#L270
   var geodesicArea = function (latLngs) {
     var pointsCount = latLngs.length,
@@ -270,10 +270,10 @@ var mapping = (function () {
       reportAreaTooBig = fn;
     },
     setCallbacks: function(fns){
-      callbacks = fns; 
+      callbacks = fns;
     },
-    getMap : function(){ 
-      return map 
+    getMap : function(){
+      return map
     },
     init : function (newConfig) {
       _.extend(config,newConfig);
