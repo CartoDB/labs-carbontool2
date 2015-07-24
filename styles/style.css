@@ -195,3 +195,24 @@ button {
 .button--gray a:hover {
   background: #e7e7e7;
 }
+
+
+/* report */
+.report, .report .section {
+  display: none;
+}
+
+.report .title{
+  font-weight: bold;
+  height: 2em;
+  border-bottom: 3px solid black;
+  margin-bottom: 4px;
+  vertical-align: bottom;
+}
+.report .title .value {
+  font-size: 2em;
+}
+
+.report .IconFont {
+  color: gray;
+}
