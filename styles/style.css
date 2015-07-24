@@ -205,7 +205,7 @@ button {
 .report .title{
   font-weight: bold;
   height: 2em;
-  border-bottom: 3px solid black;
+  border-bottom: 3px solid #333;
   margin-bottom: 4px;
   vertical-align: bottom;
 }
@@ -215,4 +215,33 @@ button {
 
 .report .IconFont {
   color: gray;
+}
+
+.report .forest-status .detail .text{
+  float: left;
+}
+.report .forest-status .detail .value{
+  float: right;
+}
+
+.report .forest-restoration ul li{
+  width: 24%;
+  text-align: center;
+}
+
+.report .forest-restoration li .text{
+  padding: 10px 0;
+  text-align: center
+}
+
+.report .forest-restoration li .value{
+  font-size: 2em;
+  line-height: 1.4em;
+}
+
+
+
+/* temporaly hiding of the layer switcher */
+.legends{
+  display:none;
 }

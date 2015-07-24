@@ -105,12 +105,12 @@
                       <span class="Number-circle u-txt-center fill fill-dark color-white u-iblock u-malign">2</span> <h2 class="u-iblock u-malign"><strong>Launch report</strong> </h2>
                     </div>
 
-                    <button id="launch-button" class="button button--small button--gray">
+                    <button id="launch-button" class="button button--small button--gray" disabled>
                       <a class="btn btn-sm btn-success draw">
                         <span class="Tooltip Tooltip--horizontal-left Tooltip--vertical-bottom">
                           Select an area to analyse
                         </span>
-                        Launch
+                        <span class="title">Launch</span>
                       </a>
                     </button>
                   </div>
@@ -120,6 +120,31 @@
                     <div class="u-vspace-m">
                       <span class="Number-circle u-txt-center fill fill-dark color-white u-iblock u-malign">3</span> <h2 class="u-iblock u-malign"><strong>Report</strong> </h2>
                     </div>
+
+
+                    <!-- Carbon Countries -->
+                    <div class="section carbon-countries u-vspace-l">
+                      <p class="title u-tupper block clearfix">
+                        <span class="text u-left u-valign">
+                          Carbon
+                          <span>
+                            <span class="Tooltip Tooltip--horizontal-left Tooltip--vertical-bottom">
+                              Total carbon stored in above- and below-ground biomass and soil.
+                            </span>
+                            <i class="IconFont IconFont--size10 IconFont--power"></i>
+                          </span>
+                        </span>
+                        <span class="result u-right u-valign">
+                          <span class="value"></span>
+                          <span class="unit">T</span>
+                        </span>
+                      </p>
+                      <div class="detail">
+                        <ul class="block clearfix u-vspace-m"> </ul>
+                      </div>
+                    </div>
+
+
 
                     <!-- C.Seq -->
                     <div class="section cseq u-vspace-l">
@@ -141,6 +166,7 @@
                       </p>
                     </div>
 
+                    <!-- Covered by KBAs -->
                     <div class="section covered-kba u-vspace-l">
                       <p class="title u-tupper block clearfix">
                         <span class="text u-left u-valign">
@@ -162,10 +188,79 @@
                         <p>Overlapping with <strong><span class="value strong">55</span></strong> Key Biodiversity Area(s)</p>
                       </div>
                     </div>
+
+                    <!-- Forest Restoration Potential -->
+                    <div class="section forest-restoration u-vspace-l">
+                      <p class="title u-tupper block clearfix">
+                        <span class="text u-left u-valign">
+                          Forest restoration potential
+                          <span>
+                            <span class="Tooltip Tooltip--horizontal-left Tooltip--vertical-bottom">
+                              RESTORATION POTENTIAL</br>
+                              Potential of the AOI for wide-scale, mosaic, or remote restoration.
+                            </span>
+                            <i class="IconFont IconFont--size10 IconFont--power"></i>
+                          </span>
+                        </span>
+                      </p>
+                      <div class="detail">
+                        <ul class="u-ilist">
+                          <li class="u-txt-center">
+                            <h5 class="text fill fill-medium">WIDE-SCALE</h5>
+                            <p class="value wide_scale"></p>
+                          </li>
+                          <li>
+                            <h5 class="text fill fill-medium">MOSAIC</h5>
+                            <p class="value mosaic"></p>
+                          </li>
+                          <li>
+                            <h5 class="text fill fill-medium">REMOTE</h5>
+                            <p class="value remote"></p>
+                          </li>
+                          <li>
+                            <h5 class="text fill fill-medium">NONE</h5>
+                            <p class="value none"></p>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <!-- Forest Status -->
+                    <div class="section forest-status u-vspace-l">
+                      <p class="title u-tupper block clearfix">
+                        <span class="text u-left u-valign">
+                          Forest status
+                          <span>
+                            <span class="Tooltip Tooltip--horizontal-left Tooltip--vertical-bottom">
+                              FOREST STATUS</br>
+                              Classification of forest by impact from intact forest
+                              (lowest impact) to deforested (highest impact).
+                            </span>
+                            <i class="IconFont IconFont--size10 IconFont--power"></i>
+                          </span>
+                        </span>
+                      </p>
+                      <div class="detail">
+                        <ul>
+                          <li>
+                            <p class="text">% Defined as intact forest</p>
+                            <p class="value intact"></p>
+                          </li>
+                          <li>
+                            <p class="text">% Defined as fragmented/managed forest</p>
+                            <p class="value fragmented"></p>
+                          </li>
+                          <li>
+                            <p class="text">% Defined as partially deforested areas</p>
+                            <p class="value partially"></p>
+                          </li>
+                          <li>
+                            <p class="text">% Defined as deforested areas</p>
+                            <p class="value deforested"></p>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
-
-
-                  <p class="text-info js-about">2015 - <a href="#">About us</a></p>
                 </div>
               </div>
             </div>

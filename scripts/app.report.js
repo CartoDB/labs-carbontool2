@@ -1,9 +1,14 @@
 var reporting = (function () {
   var config = {
     cdbUser: 'carbon-tool',
+    launchButtonTexts: {
+      launch : 'Launch',
+      running: 'Running...'
+    },
     tooltipText : {
       enabled: 'Launch the report',
-      disabled: 'Select an area to analyse'
+      disabled: 'Select an area to analyse',
+      running: 'Wait until the analysis is finished'
     },
     selectors: {
       launchButton: '#launch-button',
@@ -31,17 +36,38 @@ var reporting = (function () {
   }
 
   var addReportButton = function(){
-    $(config.selectors.launchButton).removeClass('button--gray');
-    $(config.selectors.launchButton).addClass('button--blue');
+    $(config.selectors.launchButton)
+      .removeClass('button--gray')
+      .removeClass('button--red')
+      .addClass('button--blue')
+      .removeAttr('disabled');
+
+    $(config.selectors.launchButton + ' .title')
+      .text(config.launchButtonTexts.launch);
+
     $(config.selectors.launchButton + ' .Tooltip').text(config.tooltipText.enabled);
-  }
+  };
+
+  var disableReportButton = function(text,color,tooltip){
+    $(config.selectors.launchButton)
+      .removeClass('button--blue')
+      .addClass(color ? color : 'button--gray')
+      .attr('disabled','disabled');
+
+    $(config.selectors.launchButton + ' .title')
+      .text(text ? text : config.launchButtonTexts.launch);
+
+    $(config.selectors.launchButton + ' .Tooltip').text(
+      tooltip ? tooltip : config.tooltipText.disabled
+    );
+  };
+
+
 
   var reportAreaTooBig = function(){
     $(config.selectors.areaTooBig).fadeIn();
-    $(config.selectors.launchButton).removeClass('button--blue');
-    $(config.selectors.launchButton).addClass('button--gray');
-    $(config.selectors.launchButton + ' .Tooltip').text(config.tooltipText.disabled);
-  }
+    disableReportButton();
+  };
 
 
   var reportCurrentView = function(bounds){
@@ -94,6 +120,13 @@ var reporting = (function () {
   var launchReport = function(e){
     var geom = getSQLGeometry(geometryReport);
 
+    disableReportButton(
+      config.launchButtonTexts.running,
+      'button--red'
+      ,config.tooltipText.running
+    );
+
+    var d1 = $.Deferred();
     sqlClient.execute(_.template(QUERIES.COVERED_KBA)({polygon: geom}))
       .done(function(data){
         //Put the result on the report
@@ -106,19 +139,24 @@ var reporting = (function () {
             $('.report .covered-kba').show();
           }
         }
+        d1.resolve(data.time);
       });
 
+    var d2 = $.Deferred();
     sqlClient.execute(_.template(QUERIES.CARBON)({polygon: geom}))
       .done(function(data){
         if (data.rows.length){
           var result = data.rows[0];
-          console.log(result);
-          $('.report .cseq .title .value').text(formatNumber(result.total.toFixed(0)));
-          $('.report').show();
-          $('.report .cseq').show();
+          if (result.total){
+            $('.report .cseq .title .value').text(formatNumber(result.total.toFixed(0)));
+            $('.report').show();
+            $('.report .cseq').show();
+          }
         }
+        d2.resolve(data.time);
       });
 
+    var d3 = $.Deferred();
     sqlClient.execute(_.template(QUERIES.FOREST)({polygon: geom}))
       .done(function(data){
         if (data.rows.length>0){
@@ -126,49 +164,90 @@ var reporting = (function () {
           var total = results.map(function(o){return o.total}).reduce(function(p,c){return p + c});
 
           var getBandPercentage = function(band){
-            return (results.filter(function(o){return o.band == band})[0]).total/total * 100;
+            var value = (results.filter(function(o){return o.band == band})[0]).total/total * 100;
+            return value.toFixed(0) + '%';
           }
 
-          var deforested     = getBandPercentage(1);
-          var fragmented     = getBandPercentage(2);
-          var intact         = getBandPercentage(3);
-          var partDeforested = getBandPercentage(4);
+          var deforested = getBandPercentage(1);
+          var fragmented = getBandPercentage(2);
+          var intact     = getBandPercentage(3);
+          var partially  = getBandPercentage(4);
 
-          // TODO Format into HTML
-          debugger;
-          console.log(result);
-          $('.report .forest .detail .value1').text(formatNumber(result.total.toFixed(0)));
+          $('.report .forest-status .detail .deforested').text(deforested);
+          $('.report .forest-status .detail .fragmented').text(fragmented);
+          $('.report .forest-status .detail .intact').text(intact);
+          $('.report .forest-status .detail .partially').text(partially);
           $('.report').show();
-          $('.report .forest').show();
+          $('.report .forest-status').show();
         }
+        d3.resolve(data.time);
+      });
 
+    var d4 = $.Deferred();
+    sqlClient.execute(_.template(QUERIES.RESTORATION)({polygon: geom}))
+      .done(function(data){
+        if (data.rows.length>0){
+          var value_map = {'1': 'wide_scale', '2': 'mosaic', '3': 'remote', '4':'agricultural lands'};
+          var stats = {
+            'wide_scale': 0,
+            'mosaic': 0,
+            'remote': 0,
+            'none': 0
+          };
+          var total = 1.0;
+          var percent = 100.0;
+          _.each(data.rows, function(x) {
+              var p = x.percentage;
+              percent -= p;
+              stats[value_map[x.band]] = p;
+          });
+          stats.none = percent;
+
+          $('.report .forest-restoration .detail .wide_scale').text(stats.wide_scale.toFixed(0) + '%');
+          $('.report .forest-restoration .detail .mosaic').text(stats.mosaic.toFixed(0) + '%');
+          $('.report .forest-restoration .detail .remote').text(stats.remote.toFixed(0) + '%');
+          $('.report .forest-restoration .detail .none').text(stats.none.toFixed(0) + '%');
+          $('.report').show();
+          $('.report .forest-restoration').show();
+        }
+        d4.resolve(data.time);
+      });
+
+    var d5 = $.Deferred();
+    sqlClient.execute(_.template(QUERIES.CARBON_COUNTRIES)({polygon: geom}))
+      .done(function(data){
+        if (data.rows.length>0){
+          data.rows.sort(function(a,b){
+            return a.total < b.total;
+          });
+          var total = data.rows
+            .map(function(o){return o.total})
+            .reduce(function(c,p){return c + p });
+
+          $('.report .carbon-countries .title .value').text(formatNumber(total.toFixed(0)));
+
+          data.rows.forEach(function(row){
+            var country = row.country;
+            var total = row.total;
+            $('.report .carbon-countries ul').append(
+              '<li class="block clearfix"><p class="u-left">'+country+'</p>' +
+              '<p class="u-right">'+formatNumber(total.toFixed(0)) + ' T</p></li>'
+              );
+          });
+
+          $('.report').show();
+          $('.report .carbon-countries').show();
+        }
+        d5.resolve(data.time);
       });
 
 
-
-    console.log("CARBON");
-    console.log(_.template(QUERIES.CARBON)({polygon: geom}));
-
-    console.log("CARBON_COUNTRIES");
-    console.log(_.template(QUERIES.CARBON_COUNTRIES)({polygon: geom}));
-
-    console.log("CARBON_COUNTRIES");
-    console.log(_.template(QUERIES.CARBON_COUNTRIES)({polygon: geom}));
-
-    console.log("RESTORATION");
-    console.log(_.template(QUERIES.RESTORATION)({polygon: geom}));
-
-    console.log("FOREST");
-    console.log(_.template(QUERIES.FOREST)({polygon: geom}));
-
-    console.log("COVERED_KBA");
-    console.log(_.template(QUERIES.COVERED_KBA)({polygon: geom}));
-
-    console.log("COUNTRIES");
-    console.log(_.template(QUERIES.COUNTRIES)({polygon: geom}));
-
-
-  }
+    $.when(d1,d2,d3,d4,d5).done(function(v1,v2,v3,v4,v5){
+      console.log("Total time" + (v1 + v2 + v3 + v4 + v5))
+      addReportButton();
+      debugger;
+    });
+  };
 
   // From http://viz-carbontool.appspot.com/tool
   var wtk_polygon = function(poly) {
